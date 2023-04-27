@@ -19,6 +19,45 @@ public class CourseManager {
     // One map represent one schedule
     private static List<List<Map.Entry<String, Section>>> generatedSchedules = new ArrayList<>();
 
+    public static void addCourse(String courseNumber){
+        Optional<Course> course = Filters.getCourseByCourseNumber(courseNumber);
+        if (!course.isPresent()){
+            // return 404
+            // No course found with that course number
+            return;
+        }
+        for (Course chosenCourse : chosenCourses){
+            if (course.get().getCourseNumber().equals(chosenCourse.getCourseNumber())){
+                // return 400
+                // Course is already chosen
+                return;
+            }
+        }
+        chosenCourses.add(course.get());
+        generatedSchedules = generateSchedules();
+        // return 200
+    }
+
+    public static void removeCourse(String courseNumber){
+        Optional<Course> course = Filters.getCourseByCourseNumber(courseNumber);
+        if (!course.isPresent()){
+            // return 404
+            // No course found with that course number
+            return;
+        }
+        for (Course chosenCourse : chosenCourses){
+            if (course.get().getCourseNumber().equals(chosenCourse.getCourseNumber())){
+                // return 200
+                chosenCourses.remove(course.get());
+                generatedSchedules = generateSchedules();
+                return;
+            }
+        }
+
+        // return 404
+        // That course isn't a chosen course
+    }
+
     // Generate all possible schedules
     public static List<List<Map.Entry<String, Section>>> generateSchedules() {
         numGeneratedSchedules = 0;
