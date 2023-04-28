@@ -4,6 +4,7 @@ import com.dawson.dawsonschedulerapi.api.CourseManager;
 import com.dawson.dawsonschedulerapi.api.Filters;
 import com.dawson.dawsonschedulerapi.api.ResponseHandler;
 import com.dawson.dawsonschedulerapi.entities.Course;
+import com.dawson.dawsonschedulerapi.entities.Section;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -30,7 +32,7 @@ public class CourseController {
     }
 
     @RequestMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> addChoseCourse(@RequestParam("course-number") String courseNumber) {
+    public ResponseEntity<Object> addChosenCourse(@RequestParam("course-number") String courseNumber) {
         Optional<Course> course = Filters.getCourseByCourseNumber(courseNumber);
         if (course.isEmpty()){
             String error = "this course doesn't exist";
@@ -46,4 +48,13 @@ public class CourseController {
         HttpStatus status = HttpStatus.CREATED;
         return ResponseHandler.generateResponse(status, course, null);
     }
+
+    @RequestMapping(value = "/chosen", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getChosenCourses() {
+        List<Course> courses = CourseManager.getChosenCourses();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseHandler.generateResponse(status, courses, null);
+    }
+
+    
 }
