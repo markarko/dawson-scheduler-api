@@ -56,5 +56,10 @@ public class CourseController {
         return ResponseHandler.generateResponse(status, courses, null);
     }
 
-    
+    @RequestMapping(value = "/schedules", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getGeneratedSchedules() {
+        List<List<Map.Entry<String, Section>>> schedules = CourseManager.getGeneratedSchedules();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseHandler.generateResponse(status, schedules, null);
+    }
 }
