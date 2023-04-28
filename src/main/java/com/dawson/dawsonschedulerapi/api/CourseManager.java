@@ -19,6 +19,12 @@ public class CourseManager {
     // One map represent one schedule
     private static List<List<Map.Entry<String, Section>>> generatedSchedules = new ArrayList<>();
 
+    public static List<Course> getChosenCourses(){
+        return chosenCourses;
+    }
+    public static List<List<Map.Entry<String, Section>>>  getGeneratedSchedules(){
+        return generatedSchedules;
+    }
     public static void addCourse(Course course){
         chosenCourses.add(course);
         generatedSchedules = generateSchedules();
