@@ -12,7 +12,7 @@ public class ResponseHandler {
         map.put("status", status.value());
         if (error == null){
             map.put("data", responseObj);
-        } else {
+        } else if (responseObj != null){
             map.put("error", error);
         }
 
