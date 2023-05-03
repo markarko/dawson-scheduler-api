@@ -15,12 +15,19 @@ public class CourseManager {
     public static int maxGeneratedSchedules = 100;
 
     public static int maxChosenCourses = 8;
+    private static List<Map.Entry<String, Section>> chosenSchedule = new ArrayList<>();
     private static List<Course> chosenCourses = new ArrayList<>();
     // Stores a list of generated schedules based on the chose courses
     // The map contains the course number (string) and the section chosen from the course
     // One map represent one schedule
     private static List<List<Map.Entry<String, Section>>> generatedSchedules = new ArrayList<>();
 
+    public static List<Map.Entry<String, Section>> getChosenSchedule(){
+        return chosenSchedule;
+    }
+    public static void setChosenSchedule(List<Map.Entry<String, Section>> schedule){
+        chosenSchedule = schedule;
+    }
     public static List<Course> getChosenCourses(){
         return chosenCourses;
     }

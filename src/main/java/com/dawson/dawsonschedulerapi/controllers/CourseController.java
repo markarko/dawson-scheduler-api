@@ -8,9 +8,7 @@ import com.dawson.dawsonschedulerapi.entities.Section;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -66,5 +64,13 @@ public class CourseController {
         List<List<Map.Entry<String, Section>>> schedules = CourseManager.getGeneratedSchedules();
         HttpStatus status = HttpStatus.OK;
         return ResponseHandler.generateResponse(status, schedules, null);
+    }
+
+    @RequestMapping(value = "/schedules/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> addGeneratedSchedule(@RequestBody List<Map.Entry<String, Section>> schedule) {
+        // validate data (skip for now assuming it's correct from the client side)
+        CourseManager.setChosenSchedule(schedule);
+        HttpStatus status = HttpStatus.CREATED;
+        return ResponseHandler.generateResponse(status, null, null);
     }
 }
