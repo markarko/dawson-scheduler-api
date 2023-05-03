@@ -12,7 +12,9 @@ import java.util.Optional;
 
 public class CourseManager {
     public static int numGeneratedSchedules = 0;
-    public static int maxGeneratedSchedules = 500;
+    public static int maxGeneratedSchedules = 100;
+
+    public static int maxChosenCourses = 8;
     private static List<Course> chosenCourses = new ArrayList<>();
     // Stores a list of generated schedules based on the chose courses
     // The map contains the course number (string) and the section chosen from the course
@@ -88,14 +90,14 @@ public class CourseManager {
             // Check if this section overlaps with any section already in the current selection
             boolean overlaps = false;
 
-            List<Map.Entry<String, Section>> _currentSections = new ArrayList<>();
+            List<Map.Entry<String, Section>> _currentSections = new ArrayList<>(currentSections);
 
 
             for (Map.Entry<String, Section> entry : _currentSections) {
                 Section selectedSection = entry.getValue();
                 for (Schedule schedule : section.getSchedules()) {
                     for (Schedule selectedSchedule : selectedSection.getSchedules()) {
-                        if (schedulesHaveConflict(schedule, selectedSchedule) && sectionsFromSameCourse(entry.getKey(), currentCourse.getCourseNumber())) {
+                        if (schedulesHaveConflict(schedule, selectedSchedule) || sectionsFromSameCourse(entry.getKey(), currentCourse.getCourseNumber())) {
                             overlaps = true;
                             break;
                         }
@@ -162,6 +164,8 @@ public class CourseManager {
 
 
     public static boolean schedulesHaveConflict(Schedule schedule1, Schedule schedule2) {
+        // NOTE: Possibly change the time to int type since it these checks can be performed faster
+
         Time start1 = schedule1.getStartTime();
         Time end1 = schedule1.getEndTime();
         Time start2 = schedule2.getStartTime();
@@ -173,32 +177,26 @@ public class CourseManager {
         }
 
         // Case 1: Schedule 1 starts before Schedule 2, and ends during Schedule 2
-        if (start1.before(start2) && end1.after(start2) && end1.before(end2)) {
+        if (start1.before(start2) && end1.after(start2) && ( end1.before(end2) || end1.equals(end2))) {
             return true;
         }
 
         // Case 2: Schedule 1 starts before Schedule 2, and ends after Schedule 2
-        if (start1.before(start2) && end1.after(end2)) {
+        if ((start1.before(start2) || start1.equals(start2)) && end1.after(end2)) {
             return true;
         }
 
         // Case 3: Schedule 1 starts during Schedule 2, and ends during Schedule 2
-        if (start1.after(start2) && end1.before(end2)) {
+        if ((start1.after(start2) || start1.equals(start2)) && (end1.before(end2) || end1.equals(end2))) {
             return true;
         }
 
         // Case 4: Schedule 1 starts during Schedule 2, and ends after Schedule 2
-        if (start1.after(start2) && start1.before(end2) && end1.after(end2)) {
-            return true;
-        }
-
-        // Case 5: Schedule 1 starts and ends at the same time as Schedule 2
-        if (start1.equals(start2) && end1.equals(end2)) {
+        if ((start1.after(start2) || start1.equals(start2)) && start1.before(end2) && end1.after(end2)) {
             return true;
         }
 
         // No conflict found
         return false;
     }
-
 }
