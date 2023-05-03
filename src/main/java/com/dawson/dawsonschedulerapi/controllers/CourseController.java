@@ -44,6 +44,11 @@ public class CourseController {
             HttpStatus status = HttpStatus.CONFLICT;
             return ResponseHandler.generateResponse(status, null, error);
         }
+        if (CourseManager.getChosenCourses().size() >= CourseManager.maxChosenCourses){
+            String error = "you can only choose 8 courses at a time";
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            return ResponseHandler.generateResponse(status, null, error);
+        }
         CourseManager.addCourse(course.get());
         HttpStatus status = HttpStatus.CREATED;
         return ResponseHandler.generateResponse(status, course, null);
