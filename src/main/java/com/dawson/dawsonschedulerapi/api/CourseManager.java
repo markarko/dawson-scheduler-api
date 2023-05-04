@@ -48,24 +48,9 @@ public class CourseManager {
         return false;
     }
 
-    public static void removeCourse(String courseNumber){
-        Optional<Course> course = Filters.getCourseByCourseNumber(courseNumber);
-        if (!course.isPresent()){
-            // return 404
-            // No course found with that course number
-            return;
-        }
-        for (Course chosenCourse : chosenCourses){
-            if (course.get().getCourseNumber().equals(chosenCourse.getCourseNumber())){
-                // return 200
-                chosenCourses.remove(course.get());
-                generatedSchedules = generateSchedules();
-                return;
-            }
-        }
-
-        // return 404
-        // That course isn't a chosen course
+    public static void removeCourse(Course course){
+        chosenCourses.remove(course);
+        generatedSchedules = generateSchedules();
     }
 
     // Generate all possible schedules

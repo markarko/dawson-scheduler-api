@@ -52,6 +52,24 @@ public class CourseController {
         return ResponseHandler.generateResponse(status, course, null);
     }
 
+    @RequestMapping(value = "/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> removeChosenCourse(@RequestParam("course-number") String courseNumber) {
+        Optional<Course> course = Filters.getCourseByCourseNumber(courseNumber);
+        if (course.isEmpty()){
+            String error = "this course doesn't exist";
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            return ResponseHandler.generateResponse(status, null, error);
+        }
+        if (!CourseManager.courseAlreadyChosen(course.get())){
+            String error = "this course is not chosen";
+            HttpStatus status = HttpStatus.CONFLICT;
+            return ResponseHandler.generateResponse(status, null, error);
+        }
+        CourseManager.removeCourse(course.get());
+        HttpStatus status = HttpStatus.ACCEPTED;
+        return ResponseHandler.generateResponse(status, course, null);
+    }
+
     @RequestMapping(value = "/chosen", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getChosenCourses() {
         List<Course> courses = CourseManager.getChosenCourses();
