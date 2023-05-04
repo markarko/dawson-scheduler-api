@@ -73,4 +73,16 @@ public class CourseController {
         HttpStatus status = HttpStatus.CREATED;
         return ResponseHandler.generateResponse(status, null, null);
     }
+
+    @RequestMapping(value = "/schedules/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> addGeneratedSchedule() {
+        List<Map.Entry<String, Section>> schedule = CourseManager.getChosenSchedule();
+        if (schedule.size() == 0){
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            String error = "no schedules were previously added";
+            return ResponseHandler.generateResponse(status, null, error);
+        }
+        HttpStatus status = HttpStatus.OK;
+        return ResponseHandler.generateResponse(status, schedule, null);
+    }
 }
