@@ -168,12 +168,18 @@ public class DawsonAPI {
                     Element dayOfWeek = cells.get(0);
                     Element times = cells.get(1);
 
-                    List<Time> parsedTimes = parseStartAndEndTimes(times.text());
+                    String[] timeSetArr = times.text().split("-");
+                    String startTimeRaw = timeSetArr[0].trim();
+                    String endTimeRaw = timeSetArr[1].trim();
+
+                    int startTime = parseTime(startTimeRaw);
+                    int endTime = parseTime(endTimeRaw);
+
                     Element location = cells.get(2);
                     Schedule scheduleEntity = Schedule.builder()
                             .dayOfWeek(getIntValueOfWeekDay(dayOfWeek.text()))
-                            .startTime(parsedTimes.get(0))
-                            .endTime(parsedTimes.get(1))
+                            .startTime(startTime)
+                            .endTime(endTime)
                             .location(location.text())
                             .build();
 
@@ -209,51 +215,44 @@ public class DawsonAPI {
     }
 
     public static int getIntValueOfWeekDay(String dayOfWeek) {
-        switch(dayOfWeek.toLowerCase()) {
-            case "sunday": return 1;
-            case "monday": return 2;
-            case "tuesday": return 3;
-            case "wednesday": return 4;
-            case "thursday": return 5;
-            case "friday": return 6;
-            case "saturday": return 7;
-            default: throw new IllegalArgumentException("The entered string is not a week day or is mistyped");
+        switch (dayOfWeek.toLowerCase()) {
+            case "sunday":
+                return 1;
+            case "monday":
+                return 2;
+            case "tuesday":
+                return 3;
+            case "wednesday":
+                return 4;
+            case "thursday":
+                return 5;
+            case "friday":
+                return 6;
+            case "saturday":
+                return 7;
+            default:
+                throw new IllegalArgumentException("The entered string is not a week day or is mistyped");
         }
     }
 
-    //Refactor the code...
-    public static List<Time> parseStartAndEndTimes(String startAndEndTime){
+    // input example: 11:30 AM
+    public static int parseTime(String time){
+        String[] timeArr = time.split(" ");
+        // example: 11:30
+        String timeOfDay = timeArr[0];
+        // example AM
+        String amOrPm = timeArr[1];
 
-        String[] startAndEndTimes = startAndEndTime.split("-");
-        String startTimeStr = startAndEndTimes[0];
-        String endTimeStr = startAndEndTimes[1];
+        String[] hoursAndMinutes = timeOfDay.split(":");
+        // example 11
+        int hours = Integer.parseInt(hoursAndMinutes[0]);
+        // example 30
+        int minutes = Integer.parseInt(hoursAndMinutes[1]);
 
-        String[] startTimeAmPmSep = startTimeStr.split(" ");
+        // offset the time by 12 hours if it's pm
+        int pmBonusTime = amOrPm.equals("PM") && hours != 12 ? 60 * 12 : 0;
 
-        if (startTimeAmPmSep[1].equals("PM") && !startTimeAmPmSep[0].split(":")[0].equals("12")){
-            startTimeAmPmSep[0] = toHoursString(toMinutes(startTimeAmPmSep[0]) + 720);
-        }
-        String[] endTimeAmPmSep = endTimeStr.split(" ");
-        if (endTimeAmPmSep[2].equals("PM") && !endTimeAmPmSep[1].split(":")[0].equals("12")){
-            endTimeAmPmSep[1] = toHoursString(toMinutes(endTimeAmPmSep[1]) + 720);
-        }
-        Time startTime = Time.valueOf(startTimeAmPmSep[0]+":00");
-        Time endTime = Time.valueOf(endTimeAmPmSep[1]+":00");
-        List<Time> times = new ArrayList<Time>();
-        times.add(startTime);
-        times.add(endTime);
-        return times;
-
-    }
-
-    public static int toMinutes(String time) {
-        String[] times = time.split(":");
-        return Integer.parseInt(times[0]) * 60 + Integer.parseInt(times[1]);
-    }
-    public static String toHoursString(int time){
-        int hours = time / 60;
-        int minutes = time % 60;
-        return hours + ":" + (minutes < 10 ? "0" + minutes : minutes);
+        return hours * 60 + minutes + pmBonusTime;
     }
 
     public static String GetRawData(String id, String password) {

@@ -158,10 +158,10 @@ public class CourseManager {
     public static boolean schedulesHaveConflict(Schedule schedule1, Schedule schedule2) {
         // NOTE: Possibly change the time to int type since it these checks can be performed faster
 
-        Time start1 = schedule1.getStartTime();
-        Time end1 = schedule1.getEndTime();
-        Time start2 = schedule2.getStartTime();
-        Time end2 = schedule2.getEndTime();
+        int start1 = schedule1.getStartTime();
+        int end1 = schedule1.getEndTime();
+        int start2 = schedule2.getStartTime();
+        int end2 = schedule2.getEndTime();
 
         // If schedules aren't on the same day, no conflicts possible
         if (schedule1.getDayOfWeek() != schedule2.getDayOfWeek()){
@@ -169,22 +169,22 @@ public class CourseManager {
         }
 
         // Case 1: Schedule 1 starts before Schedule 2, and ends during Schedule 2
-        if (start1.before(start2) && end1.after(start2) && ( end1.before(end2) || end1.equals(end2))) {
+        if (start1 < start2 && end1 > start2 && (end1 < end2 || end1 == end2)) {
             return true;
         }
 
         // Case 2: Schedule 1 starts before Schedule 2, and ends after Schedule 2
-        if ((start1.before(start2) || start1.equals(start2)) && end1.after(end2)) {
+        if ((start1 < start2 || start1 == start2) && end1 > end2) {
             return true;
         }
 
         // Case 3: Schedule 1 starts during Schedule 2, and ends during Schedule 2
-        if ((start1.after(start2) || start1.equals(start2)) && (end1.before(end2) || end1.equals(end2))) {
+        if ((start1 > start2 || start1 == start2) && (end1 < end2 || end1 == end2)) {
             return true;
         }
 
         // Case 4: Schedule 1 starts during Schedule 2, and ends after Schedule 2
-        if ((start1.after(start2) || start1.equals(start2)) && start1.before(end2) && end1.after(end2)) {
+        if ((start1 > start2 || start1 == start2) && start1 < end2 && end1 > end2) {
             return true;
         }
 

@@ -13,8 +13,8 @@ import java.sql.Time;
 @Builder
 public class Schedule {
     private int dayOfWeek;
-    private Time startTime;
-    private Time endTime;
+    private int startTime;
+    private int endTime;
     private String location;
 }
 
