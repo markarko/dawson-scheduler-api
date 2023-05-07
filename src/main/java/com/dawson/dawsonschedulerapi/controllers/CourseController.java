@@ -74,6 +74,6 @@ public class CourseController {
     public ResponseEntity<Object> getChosenCourses() {
         List<Course> courses = CourseManager.getChosenCourses();
         HttpStatus status = HttpStatus.OK;
-        return ResponseHandler.generateResponse(status, courses, null);
+        return ResponseHandler.generateResponse(status, courses.size() == 0 ? null : courses, null);
     }
 }
