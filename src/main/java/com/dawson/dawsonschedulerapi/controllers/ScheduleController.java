@@ -32,24 +32,4 @@ public class ScheduleController {
         HttpStatus status = HttpStatus.OK;
         return ResponseHandler.generateResponse(status, schedules.size() == 0 ? null : schedules, null);
     }
-
-    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> addGeneratedSchedule(@RequestBody List<Map.Entry<String, Section>> schedule) {
-        // validate data (skip for now assuming it's correct from the client side)
-        CourseManager.setChosenSchedule(schedule);
-        HttpStatus status = HttpStatus.CREATED;
-        return ResponseHandler.generateResponse(status, null, null);
-    }
-
-    @RequestMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> addGeneratedSchedule() {
-        List<Map.Entry<String, Section>> schedule = CourseManager.getChosenSchedule();
-        if (schedule.size() == 0){
-            HttpStatus status = HttpStatus.NOT_FOUND;
-            String error = "no schedules were previously added";
-            return ResponseHandler.generateResponse(status, null, error);
-        }
-        HttpStatus status = HttpStatus.OK;
-        return ResponseHandler.generateResponse(status, schedule, null);
-    }
 }
