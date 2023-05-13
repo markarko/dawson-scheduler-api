@@ -9,31 +9,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CourseManager {
     public static int numGeneratedSchedules = 0;
     public static int maxGeneratedSchedules = 100;
 
     public static int maxChosenCourses = 8;
-    private static List<Course> chosenCourses = new ArrayList<>();
+    // Corresponds to the course number and associated chosen sections
+    private static List<Map.Entry<String, List<Section>>> chosenCourses = new ArrayList<>();
     // Stores a list of generated schedules based on the chose courses
     // The map contains the course number (string) and the section chosen from the course
     // One map represent one schedule
     private static List<List<Map.Entry<String, Section>>> generatedSchedules = new ArrayList<>();
 
-    public static List<Course> getChosenCourses(){
+    public static List<Map.Entry<String, List<Section>>> getChosenCourses(){
         return chosenCourses;
     }
     public static List<List<Map.Entry<String, Section>>>  getGeneratedSchedules(){
         return generatedSchedules;
     }
-    public static void addCourse(Course course){
+
+    public static List<Course> getOnlyCourses(){
+        return chosenCourses.stream().map(e -> e.getKey()).map(c -> Filters.getCourseByCourseNumber(c).get()).toList();
+    }
+    public static void addCourse(Map.Entry<String, List<Section>> course){
         chosenCourses.add(course);
         generatedSchedules = generateSchedules();
     }
 
     public static boolean courseAlreadyChosen(Course course){
-        for (Course chosenCourse : chosenCourses){
+        List<Course> courses = getOnlyCourses();
+        for (Course chosenCourse : courses){
             if (course.getCourseNumber().equals(chosenCourse.getCourseNumber())){
                 return true;
             }
@@ -41,9 +48,14 @@ public class CourseManager {
         return false;
     }
 
-    public static void removeCourse(Course course){
-        chosenCourses.remove(course);
-        generatedSchedules = generateSchedules();
+    public static void removeCourse(String courseNumber){
+        for (Map.Entry<String, List<Section>> course : chosenCourses) {
+            if (course.getKey().equals(courseNumber)) {
+                chosenCourses.remove(course);
+                generatedSchedules = generateSchedules();
+                return;
+            }
+        }
     }
 
     // Generate all possible schedules
@@ -68,10 +80,12 @@ public class CourseManager {
         }
 
         // Get the next course to consider
-        Course currentCourse = chosenCourses.get(currentSections.size());
+        Course currentCourse = getOnlyCourses().get(currentSections.size());
+
+        List<Section> currentCourseSections = chosenCourses.get(currentSections.size()).getValue();
 
         // Try each section in the current course
-        for (Section section : currentCourse.getSections()) {
+        for (Section section : currentCourseSections) {
             // Check if this section overlaps with any section already in the current selection
             boolean overlaps = false;
 
