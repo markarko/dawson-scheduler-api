@@ -62,6 +62,15 @@ public class CourseController {
         }
 
         List<Section> chosenSections = new ArrayList<>();
+
+        if (chosenCourse.get().getValue().get(0) == -1){
+            chosenSections = new ArrayList<>(course.get().getSections());
+            Map.Entry<String, List<Section>> courseToAdd = Map.entry(chosenCourse.get().getKey(), chosenSections);
+            CourseManager.addCourse(courseToAdd);
+            HttpStatus status = HttpStatus.CREATED;
+            return ResponseHandler.generateResponse(status, null, null);
+        }
+
         List<Integer> availableSectionNumbers = course.get().getSections().stream().map(s -> s.getSection()).toList();
         List<Section> availableSections = course.get().getSections();
 
@@ -74,7 +83,6 @@ public class CourseController {
             }
             chosenSections.add(availableSections.get(sectionIndex));
         }
-        System.out.println(chosenSections);
 
         Map.Entry<String, List<Section>> courseToAdd = Map.entry(chosenCourse.get().getKey(), chosenSections);
 
