@@ -79,7 +79,18 @@ public class DawsonAPI {
             return cachedResult;
         }
 
-        List<Course> result = ParseData(GetRawData(id, password));
+
+        List<Course> result = ParseData(getDataFromFile());
+        try{
+            PrintWriter out = new PrintWriter("C:\\Users\\marko\\Desktop\\response_new_2.txt");
+            out.println(GetRawData(id, password));
+            out.close();
+        } catch (FileNotFoundException e){
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
 
         cache.put(coursesCacheKey, result);
         if (coursesCacheExpirationTime > 0) {
