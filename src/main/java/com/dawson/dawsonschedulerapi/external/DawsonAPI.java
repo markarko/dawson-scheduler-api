@@ -42,7 +42,7 @@ public class DawsonAPI {
     // To avoid making a request every time I load the program
     // Reads the html response from the file and returns a string representing the html
     public static String getDataFromFile(){
-        File file = new File("C:\\Users\\marko\\Desktop\\response_new.txt");
+        File file = new File("C:\\Users\\marko\\Desktop\\response_new_2.txt");
         BufferedReader reader = null;
 
         try {
@@ -79,17 +79,7 @@ public class DawsonAPI {
             return cachedResult;
         }
 
-
         List<Course> result = ParseData(getDataFromFile());
-        try{
-            PrintWriter out = new PrintWriter("C:\\Users\\marko\\Desktop\\response_new_2.txt");
-            out.println(GetRawData(id, password));
-            out.close();
-        } catch (FileNotFoundException e){
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
 
 
         cache.put(coursesCacheKey, result);
@@ -164,11 +154,13 @@ public class DawsonAPI {
                     teacher = rows.get(2).select("div.col-md-10").first();
                     description = rows.get(3).select("div.col-md-10").first();
                     schedules = rows.get(6).select("div.col-md-10").first().select("table tbody tr");
-                } else {
+                } else if (rows.size() == 5){
                     section = rows.get(0).select("div.col-md-10").first();
                     teacher = rows.get(1).select("div.col-md-10").first();
                     description = rows.get(2).select("div.col-md-10").first();
                     schedules = rows.get(4).select("div.col-md-10").first().select("table tbody tr");
+                } else {
+                    continue;
                 }
 
 
