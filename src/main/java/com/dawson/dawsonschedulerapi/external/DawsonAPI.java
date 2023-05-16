@@ -38,7 +38,7 @@ public class DawsonAPI {
     // Cache that would hold the courses objects
     private static final Map<String, List<Course>> cache = new ConcurrentHashMap<>();
     private static final String coursesCacheKey = "courses";
-    private static final long coursesCacheExpirationTime = 1000*3600;
+    private static final long coursesCacheExpirationTime = 1000*3600*48;
     // To avoid making a request every time I load the program
     // Reads the html response from the file and returns a string representing the html
     public static String getDataFromFile(){
@@ -79,7 +79,7 @@ public class DawsonAPI {
             return cachedResult;
         }
 
-        List<Course> result = ParseData(getDataFromFile());
+        List<Course> result = ParseData(GetRawData(id, password));
 
         cache.put(coursesCacheKey, result);
         if (coursesCacheExpirationTime > 0) {
