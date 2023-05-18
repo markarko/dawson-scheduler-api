@@ -38,11 +38,12 @@ public class DawsonAPI {
     // Cache that would hold the courses objects
     private static final Map<String, List<Course>> cache = new ConcurrentHashMap<>();
     private static final String coursesCacheKey = "courses";
+    // expires in 48h
     private static final long coursesCacheExpirationTime = 1000*3600*48;
     // To avoid making a request every time I load the program
     // Reads the html response from the file and returns a string representing the html
     public static String getDataFromFile(){
-        File file = new File("C:\\Users\\marko\\Desktop\\response_new.txt");
+        File file = new File("C:\\Users\\marko\\Desktop\\response_new_2.txt");
         BufferedReader reader = null;
 
         try {
@@ -79,7 +80,8 @@ public class DawsonAPI {
             return cachedResult;
         }
 
-        List<Course> result = ParseData(GetRawData(id, password));
+        List<Course> result = ParseData(getDataFromFile());
+
 
         cache.put(coursesCacheKey, result);
         if (coursesCacheExpirationTime > 0) {
@@ -153,11 +155,13 @@ public class DawsonAPI {
                     teacher = rows.get(2).select("div.col-md-10").first();
                     description = rows.get(3).select("div.col-md-10").first();
                     schedules = rows.get(6).select("div.col-md-10").first().select("table tbody tr");
-                } else {
+                } else if (rows.size() == 5){
                     section = rows.get(0).select("div.col-md-10").first();
                     teacher = rows.get(1).select("div.col-md-10").first();
                     description = rows.get(2).select("div.col-md-10").first();
                     schedules = rows.get(4).select("div.col-md-10").first().select("table tbody tr");
+                } else {
+                    continue;
                 }
 
 
