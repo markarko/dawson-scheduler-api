@@ -80,8 +80,7 @@ public class DawsonAPI {
             return cachedResult;
         }
 
-        List<Course> result = ParseData(getDataFromFile());
-
+        List<Course> result = ParseData(GetRawData(id, password));
 
         cache.put(coursesCacheKey, result);
         if (coursesCacheExpirationTime > 0) {
