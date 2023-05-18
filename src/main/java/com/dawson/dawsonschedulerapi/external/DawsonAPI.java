@@ -38,6 +38,7 @@ public class DawsonAPI {
     // Cache that would hold the courses objects
     private static final Map<String, List<Course>> cache = new ConcurrentHashMap<>();
     private static final String coursesCacheKey = "courses";
+    // expires in 48h
     private static final long coursesCacheExpirationTime = 1000*3600*48;
     // To avoid making a request every time I load the program
     // Reads the html response from the file and returns a string representing the html

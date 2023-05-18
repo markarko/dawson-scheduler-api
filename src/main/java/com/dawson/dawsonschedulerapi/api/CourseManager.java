@@ -4,70 +4,31 @@ import com.dawson.dawsonschedulerapi.entities.Course;
 import com.dawson.dawsonschedulerapi.entities.Schedule;
 import com.dawson.dawsonschedulerapi.entities.Section;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class CourseManager {
     public static int numGeneratedSchedules = 0;
     public static int maxGeneratedSchedules = 100;
 
-    public static int maxChosenCourses = 8;
-    // Corresponds to the course number and associated chosen sections
-    private static List<Map.Entry<String, List<Section>>> chosenCourses = new ArrayList<>();
-    // Stores a list of generated schedules based on the chose courses
-    // The map contains the course number (string) and the section chosen from the course
-    // One map represent one schedule
-    private static List<List<Map.Entry<String, Section>>> generatedSchedules = new ArrayList<>();
+    public static int maxChosenCourses = 7;
 
-    public static List<Map.Entry<String, List<Section>>> getChosenCourses(){
-        return chosenCourses;
-    }
-    public static List<List<Map.Entry<String, Section>>>  getGeneratedSchedules(){
-        return generatedSchedules;
-    }
-
-    public static List<Course> getOnlyCourses(){
+    public static List<Course> getOnlyCourses(List<Map.Entry<String, List<Section>>> chosenCourses){
         return chosenCourses.stream().map(e -> e.getKey()).map(c -> Filters.getCourseByCourseNumber(c).get()).toList();
-    }
-    public static void addCourse(Map.Entry<String, List<Section>> course){
-        chosenCourses.add(course);
-        generatedSchedules = generateSchedules();
-    }
-
-    public static boolean courseAlreadyChosen(Course course){
-        List<Course> courses = getOnlyCourses();
-        for (Course chosenCourse : courses){
-            if (course.getCourseNumber().equals(chosenCourse.getCourseNumber())){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static void removeCourse(String courseNumber){
-        for (Map.Entry<String, List<Section>> course : chosenCourses) {
-            if (course.getKey().equals(courseNumber)) {
-                chosenCourses.remove(course);
-                generatedSchedules = generateSchedules();
-                return;
-            }
-        }
     }
 
     // Generate all possible schedules
-    public static List<List<Map.Entry<String, Section>>> generateSchedules() {
+    // Returns a list of generated schedules based on the chose courses
+    public static List<List<Map.Entry<String, Section>>> getGeneratedSchedules(List<Map.Entry<String, List<Section>>> chosenCourses) {
         numGeneratedSchedules = 0;
         List<List<Map.Entry<String, Section>>> schedules = new ArrayList<>();
-        generateSchedulesHelper(new ArrayList<>(), schedules);
+        generateSchedulesHelper(new ArrayList<>(), schedules, chosenCourses);
         return schedules;
     }
 
     // Recursive helper function to generate schedules
-    private static void generateSchedulesHelper(List<Map.Entry<String, Section>> currentSections, List<List<Map.Entry<String, Section>>> schedules) {
+    private static void generateSchedulesHelper(List<Map.Entry<String, Section>> currentSections, List<List<Map.Entry<String, Section>>> schedules, List<Map.Entry<String, List<Section>>> chosenCourses) {
         if (numGeneratedSchedules >= maxGeneratedSchedules){
             return;
         }
@@ -80,7 +41,7 @@ public class CourseManager {
         }
 
         // Get the next course to consider
-        Course currentCourse = getOnlyCourses().get(currentSections.size());
+        Course currentCourse = getOnlyCourses(chosenCourses).get(currentSections.size());
 
         List<Section> currentCourseSections = chosenCourses.get(currentSections.size()).getValue();
 
@@ -112,7 +73,7 @@ public class CourseManager {
             // If there is no overlap, add this section to the current selection and continue
             if (!overlaps) {
                 currentSections.add(Map.entry(currentCourse.getCourseNumber(), section));
-                generateSchedulesHelper(currentSections, schedules);
+                generateSchedulesHelper(currentSections, schedules, chosenCourses);
                 currentSections.remove(currentSections.size() - 1);
             }
         }
@@ -122,45 +83,6 @@ public class CourseManager {
     public static boolean sectionsFromSameCourse(String courseNumber1, String courseNumber2){
         return courseNumber1.equals(courseNumber2);
     }
-    public static void printCombinations(){
-        for (List<Map.Entry<String, Section>> generatedSchedule : generatedSchedules){
-            System.out.print("[ ");
-            for (Map.Entry<String, Section> entry : generatedSchedule){
-                System.out.print(entry.getKey() + " : " + entry.getValue().getSection());
-                System.out.print(",");
-            }
-            System.out.print(" ]");
-            System.out.println("");
-        }
-    }
-
-
-    private static boolean canAddToCombination(List<Map.Entry<String, Section>> combination, Map.Entry<String, Section> entryToAdd) {
-        // Check if the section belongs to a course already in the combination
-        for (Map.Entry<String, Section> entry : combination){
-            if (entry.getKey().equals(entryToAdd.getKey())){
-                return false;
-            }
-        }
-
-        return schedulesHaveConflict(combination, entryToAdd.getValue());
-    }
-
-    private static boolean schedulesHaveConflict(List<Map.Entry<String, Section>> combination, Section sectionToAdd) {
-        for (Map.Entry<String, Section> entry : combination) {
-            Section section = entry.getValue();
-            for (Schedule schedule : section.getSchedules()){
-                for (Schedule scheduleToAdd : sectionToAdd.getSchedules()){
-                    if (schedulesHaveConflict(schedule, scheduleToAdd)){
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
 
     public static boolean schedulesHaveConflict(Schedule schedule1, Schedule schedule2) {
         // NOTE: Possibly change the time to int type since it these checks can be performed faster
