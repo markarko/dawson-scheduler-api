@@ -1,10 +1,10 @@
-package com.dawson.dawsonschedulerapi.controllers;
+package com.dawson.dawsonschedulerapi.dawson.controllers;
 
-import com.dawson.dawsonschedulerapi.api.CourseManager;
-import com.dawson.dawsonschedulerapi.api.Filters;
-import com.dawson.dawsonschedulerapi.api.ResponseHandler;
-import com.dawson.dawsonschedulerapi.entities.Course;
-import com.dawson.dawsonschedulerapi.entities.Section;
+import com.dawson.dawsonschedulerapi.common.services.ScheduleGeneratorService;
+import com.dawson.dawsonschedulerapi.dawson.api.ResponseHandler;
+import com.dawson.dawsonschedulerapi.dawson.classes.Course;
+import com.dawson.dawsonschedulerapi.dawson.classes.Section;
+import com.dawson.dawsonschedulerapi.dawson.services.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,22 +18,29 @@ import java.util.*;
 @RestController
 @RequestMapping("/schedules")
 public class ScheduleController {
+    private final CourseService courseService;
+    private final ScheduleGeneratorService scheduleGeneratorService;
+
+    public ScheduleController(CourseService courseService, ScheduleGeneratorService scheduleGeneratorService) {
+        this.courseService = courseService;
+        this.scheduleGeneratorService = scheduleGeneratorService;
+    }
+
 
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<Object> getGeneratedSchedules(@RequestBody List<Map.Entry<String, List<String>>> chosenCoursesBody) {
-
         if (chosenCoursesBody == null || chosenCoursesBody.size() == 0) {
             String error = "no courses were provided";
             HttpStatus status = HttpStatus.BAD_REQUEST;
             return ResponseHandler.generateResponse(status, null, error);
         }
-        if (chosenCoursesBody.size() > CourseManager.maxChosenCourses){
-            String error = "you can only choose up to " + CourseManager.maxChosenCourses + " courses";
+        if (chosenCoursesBody.size() > ScheduleGeneratorService.maxChosenCourses){
+            String error = "you can only choose up to " + ScheduleGeneratorService.maxChosenCourses + " courses";
             HttpStatus status = HttpStatus.BAD_REQUEST;
             return ResponseHandler.generateResponse(status, null, error);
         }
 
-        List<Map.Entry<String, List<Section>>> chosenCourses = new ArrayList<>();
+        Map<String, List<Section>> chosenCourses = new HashMap<>();
         Map<String, List<Integer>> chosenCoursesParsed = new HashMap<>();
 
         for (Map.Entry<String, List<String>> chosenCourse : chosenCoursesBody) {
@@ -64,7 +71,7 @@ public class ScheduleController {
         }
 
         for (Map.Entry<String, List<Integer>> chosenCourse : chosenCoursesParsed.entrySet()){
-            Optional<Course> course = Filters.getCourseByCourseNumber(chosenCourse.getKey());
+            Optional<Course> course = courseService.getCourseByCourseNumber(chosenCourse.getKey());
 
             if (course.isEmpty()){
                 String error = "course with course number " + chosenCourse.getKey() + " does not exist";
@@ -74,11 +81,11 @@ public class ScheduleController {
 
             // Check if all sections are correct
 
-            List<Integer> availableSectionNumbers = course.get().getSections().stream().map(s -> s.getSection()).toList();
+            List<String> availableSectionNumbers = course.get().getSections().stream().map(s -> s.getSection()).toList();
             List<Integer> chosenSectionNumbers = new ArrayList<>(chosenCourse.getValue());
 
             if (chosenSectionNumbers.get(0) == -1){
-                chosenCourses.add(Map.entry(chosenCourse.getKey(), new ArrayList<>(course.get().getSections())));
+                chosenCourses.put(chosenCourse.getKey(), new ArrayList<>(course.get().getSections()));
                 continue;
             }
 
@@ -95,11 +102,11 @@ public class ScheduleController {
 
             List<Section> validChosenSections = new ArrayList<>(course.get().getSections());
             validChosenSections = validChosenSections.stream().filter(s -> chosenSectionNumbers.contains(s.getSection())).toList();
-            chosenCourses.add(Map.entry(chosenCourse.getKey(), validChosenSections));
+            chosenCourses.put(chosenCourse.getKey(), validChosenSections);
         }
 
 
-        List<List<Map.Entry<String, Section>>> schedules = CourseManager.getGeneratedSchedules(chosenCourses);
+        List<List<Map.Entry<String, Section>>> schedules = scheduleGeneratorService.getGeneratedSchedules(chosenCourses);
         Iterator<List<Map.Entry<String, Section>>> iterator = schedules.iterator();
         while(iterator.hasNext()) {
             List<Map.Entry<String, Section>> schedule = iterator.next();
@@ -113,5 +120,4 @@ public class ScheduleController {
     }
 
 }
-
 
