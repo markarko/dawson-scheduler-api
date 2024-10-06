@@ -20,8 +20,8 @@ public class CourseController {
     }
 
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getCourse(@RequestParam("course-number") String courseNumber) {
-        List<Course> courses = courseService.getCourseByPartialCourseNumber(courseNumber);
+    public ResponseEntity<Object> getCourse(@RequestParam("course-number") String query) {
+        List<Course> courses = courseService.getByQuery(query);
         if (courses.size() == 0){
             String error = "no courses found";
             HttpStatus status = HttpStatus.NOT_FOUND;

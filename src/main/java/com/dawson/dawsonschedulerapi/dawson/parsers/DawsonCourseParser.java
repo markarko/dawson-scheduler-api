@@ -3,6 +3,7 @@ package com.dawson.dawsonschedulerapi.dawson.parsers;
 import com.dawson.dawsonschedulerapi.dawson.classes.Course;
 import com.dawson.dawsonschedulerapi.dawson.classes.ScheduleDetails;
 import com.dawson.dawsonschedulerapi.dawson.classes.Section;
+import com.dawson.dawsonschedulerapi.utils.TimeManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,7 +15,17 @@ import java.util.List;
 
 @Component
 public class DawsonCourseParser {
+    private final TimeManager timeManager;
+
+    public DawsonCourseParser(TimeManager timeManager) {
+        this.timeManager = timeManager;
+    }
+
     public List<Course> parse(String data) {
+        if (data == null) {
+            return new ArrayList<>();
+        }
+
         List<Course> courses = new ArrayList<>();
 
         Document doc = Jsoup.parse(data);
@@ -95,10 +106,14 @@ public class DawsonCourseParser {
 
                     int startTime = parseTimeToMinutes(startTimeRaw);
                     int endTime = parseTimeToMinutes(endTimeRaw);
+                    int dayOfWeekInt = timeManager.weekDayToInt(dayOfWeek.text());
+                    if (dayOfWeekInt == -1) {
+                        continue;
+                    }
 
                     Element location = cells.get(2);
                     ScheduleDetails scheduleDetailsEntity = ScheduleDetails.builder()
-                            .dayOfWeek(getIntValueOfWeekDay(dayOfWeek.text()))
+                            .dayOfWeek(dayOfWeekInt)
                             .startTime(startTime)
                             .endTime(endTime)
                             .location(location.text())
@@ -131,18 +146,7 @@ public class DawsonCourseParser {
         return courses;
     }
 
-    private int getIntValueOfWeekDay(String dayOfWeek) {
-        return switch (dayOfWeek.toLowerCase()) {
-            case "sunday" -> 1;
-            case "monday" -> 2;
-            case "tuesday" -> 3;
-            case "wednesday" -> 4;
-            case "thursday" -> 5;
-            case "friday" -> 6;
-            case "saturday" -> 7;
-            default -> throw new IllegalArgumentException("The entered string is not a week day or is mistyped");
-        };
-    }
+
 
     private int parseTimeToMinutes(String time){
         String[] timeArr = time.split(" ");

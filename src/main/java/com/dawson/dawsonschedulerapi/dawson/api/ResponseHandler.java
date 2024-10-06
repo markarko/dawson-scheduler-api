@@ -15,6 +15,6 @@ public class ResponseHandler {
         } else if (error != null){
             map.put("error", error);
         }
-        return new ResponseEntity(map,status);
+        return new ResponseEntity<>(map,status);
     }
 }

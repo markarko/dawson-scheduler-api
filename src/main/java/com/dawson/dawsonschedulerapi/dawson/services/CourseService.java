@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
@@ -16,19 +17,15 @@ public class CourseService {
         this.courseDataProvider.initCache();
     }
 
-    private List<Course> getCourses() {
-        return courseDataProvider.getCourses();
+    public List<Course> getByQuery(String query) {
+        return courseDataProvider.getCourses().stream()
+                .filter(course -> course.getTitle().contains(query) || course.getCourseNumber().contains(query))
+                .collect(Collectors.toList());
     }
 
-    public Optional<Course> getCourseByCourseNumber(String courseNumber){
+    public Optional<Course> getByCourseNumber(String courseNumber){
         return courseDataProvider.getCourses().stream()
                 .filter(course -> course.getCourseNumber().equals(courseNumber))
                 .findFirst();
-    }
-
-    public List<Course> getCourseByPartialCourseNumber(String partialCourseNumber){
-        return courseDataProvider.getCourses().stream()
-                .filter(course -> course.getCourseNumber().contains(partialCourseNumber))
-                .toList();
     }
 }

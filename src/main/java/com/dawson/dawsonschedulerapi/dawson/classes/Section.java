@@ -10,7 +10,7 @@ public class Section extends AbstractSection {
     private final String teacher;
 
     @Builder
-    public Section(String id, String teacher, List<ScheduleDetails> scheduleDetails) {
+    public Section(String id, String teacher, List<? extends ScheduleDetails> scheduleDetails) {
         super(id, scheduleDetails);
         this.teacher = teacher;
     }

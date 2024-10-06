@@ -28,7 +28,6 @@ public class DawsonHttpCourseDataProvider implements CourseDataProvider<Course> 
     private final String id = System.getenv("DAWSON_ID");
     private final String password = System.getenv("DAWSON_PWD");
 
-
     public DawsonHttpCourseDataProvider(DawsonCourseParser parser, CourseCache courseCache) {
         this.parser = parser;
         this.cache = courseCache;
@@ -122,7 +121,7 @@ public class DawsonHttpCourseDataProvider implements CourseDataProvider<Course> 
     @Override
     public void initCache() {
         updateCache();
-        scheduleCacheUpdate();;
+        scheduleCacheUpdate();
     }
 
     private void updateCache() {
