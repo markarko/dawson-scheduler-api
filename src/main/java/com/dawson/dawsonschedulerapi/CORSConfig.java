@@ -13,7 +13,7 @@ public class CORSConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*")
+                        .allowedOrigins("https://schedurator.live")
                         .allowedMethods("GET", "POST")
                         .allowedHeaders("*");
             }
