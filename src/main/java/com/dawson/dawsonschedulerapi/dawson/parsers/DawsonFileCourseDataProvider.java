@@ -27,6 +27,10 @@ public class DawsonFileCourseDataProvider implements CourseDataProvider<Course> 
 
     private String getRawData() {
         try {
+            if (path == null) {
+                System.out.println("Path for courses file is not specified");
+                return null;
+            }
             Path filePath = Paths.get(path);
             return Files.readString(filePath);
         } catch (IOException e) {
