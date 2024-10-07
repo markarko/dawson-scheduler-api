@@ -1,4 +1,4 @@
-package com.dawson.dawsonschedulerapi.dawson;
+package com.dawson.dawsonschedulerapi.dawson.config;
 
 import com.dawson.dawsonschedulerapi.common.data.CourseDataProvider;
 import com.dawson.dawsonschedulerapi.dawson.classes.Course;
