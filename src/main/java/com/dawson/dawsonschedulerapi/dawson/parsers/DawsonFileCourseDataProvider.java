@@ -12,8 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-@Component
-@Primary
 public class DawsonFileCourseDataProvider implements CourseDataProvider<Course> {
     private final DawsonCourseParser parser;
     private final CourseCache cache;

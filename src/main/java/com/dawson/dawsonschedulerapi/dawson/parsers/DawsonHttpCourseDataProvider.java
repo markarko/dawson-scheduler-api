@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Component
 public class DawsonHttpCourseDataProvider implements CourseDataProvider<Course> {
     private final DawsonCourseParser parser;
     private final CourseCache cache;
