@@ -34,6 +34,6 @@ jobs:
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: springboot-app-test
+          app-name: schedurator
           publish-profile: ${{ secrets.azureWebAppPublishProfile }}
           package: '*.jar'
