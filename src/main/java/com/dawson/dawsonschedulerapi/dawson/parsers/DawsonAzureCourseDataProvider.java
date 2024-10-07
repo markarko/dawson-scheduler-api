@@ -4,15 +4,11 @@ import com.azure.storage.blob.*;
 import com.dawson.dawsonschedulerapi.common.data.CourseDataProvider;
 import com.dawson.dawsonschedulerapi.dawson.classes.Course;
 import com.dawson.dawsonschedulerapi.dawson.classes.CourseCache;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
-@Profile("PRODUCTION")
 public class DawsonAzureCourseDataProvider implements CourseDataProvider<Course> {
     private final DawsonCourseParser parser;
     private final CourseCache cache;
