@@ -19,7 +19,7 @@ jobs:
       - name: Build Project
         run: mvn clean install -DskipTests
       - name: Upload Artifact for deployment job
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: springboot-example
           path: ${{ github.workspace }}/target/*.jar
@@ -28,11 +28,11 @@ jobs:
     needs: build
     steps:
       - name: Download Artifact from build job
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: springboot-example
       - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: springboot-app-test
           publish-profile: ${{ secrets.azureWebAppPublishProfile }}
