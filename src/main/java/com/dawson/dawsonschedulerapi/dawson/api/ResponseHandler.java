@@ -1,4 +1,4 @@
-package com.dawson.dawsonschedulerapi.api;
+package com.dawson.dawsonschedulerapi.dawson.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +15,6 @@ public class ResponseHandler {
         } else if (error != null){
             map.put("error", error);
         }
-        return new ResponseEntity(map,status);
+        return new ResponseEntity<>(map,status);
     }
 }
